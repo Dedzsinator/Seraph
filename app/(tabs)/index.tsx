@@ -1,70 +1,103 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import HomeScreen from '../../screens/MainPage'; // Make sure this path is correct
+import AuctionScreen from '../../screens/AuctionScreen'; // Make sure this path is correct
+import ArtPieceDetailScreen from '../../screens/ArtPieceDetailScreen'; // Make sure this path is correct
+import ModeratorScreen from '../../screens/ModeratorScreen'; // Make sure this path is correct
+import AdminUsersScreen from '../../screens/AdminUsersScreen'; // Make sure this path is correct
+import AdminArtPiecesScreen from '../../screens/AdminArtPiecesScreen'; // Make sure this path is correct
+import AdminAddArtPiecesScreen from '../../screens/AdminAddArtPiecesScreen'; // Make sure this path is correct
+import AdminSQLScreen from '../../screens/AdminSQLScreen'; // Make sure this path is correct
+import Header from '../components/Header'; // Make sure this path is correct
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const Stack = createStackNavigator();
+const Drawer = createDrawerNavigator();
 
-export default function HomeScreen() {
+const DrawerContent = ({ navigation }) => {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.drawerContent}>
+      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+        <Text style={styles.drawerItem}>Home</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Auction')}>
+        <Text style={styles.drawerItem}>Auction</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('Moderator')}>
+        <Text style={styles.drawerItem}>Moderator</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('AdminUsers')}>
+        <Text style={styles.drawerItem}>Admin Users</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('AdminArtPieces')}>
+        <Text style={styles.drawerItem}>Admin Art Pieces</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('AdminAddArtPieces')}>
+        <Text style={styles.drawerItem}>Add Art Pieces</Text>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => navigation.navigate('AdminSQL')}>
+        <Text style={styles.drawerItem}>Submit SQL</Text>
+      </TouchableOpacity>
+      {/* Add more drawer items here */}
+    </View>
   );
-}
+};
+
+const MainStack = () => {
+  return (
+    <Stack.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false, // Hide the default header
+      }}
+    >
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="Auction" component={AuctionScreen} />
+      <Stack.Screen name="ArtPieceDetail" component={ArtPieceDetailScreen} />
+      <Stack.Screen name="Moderator" component={ModeratorScreen} />
+      <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+      <Stack.Screen name="AdminArtPieces" component={AdminArtPiecesScreen} />
+      <Stack.Screen name="AdminAddArtPieces" component={AdminAddArtPiecesScreen} />
+      <Stack.Screen name="AdminSQL" component={AdminSQLScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  return (
+      <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
+        <Drawer.Screen
+          name="Main"
+          options={{
+            header: ({ navigation }) => (
+              <Header
+                navigation={navigation}
+                isLoggedIn={isLoggedIn}
+                onLogin={() => setIsLoggedIn(true)}
+                onProfilePress={() => console.log('Profile pressed')}
+              />
+            ),
+          }}
+        >
+          {() => <MainStack />}
+        </Drawer.Screen>
+      </Drawer.Navigator>
+  );
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  drawerContent: {
+    flex: 1,
+    padding: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  drawerItem: {
+    fontSize: 18,
+    marginBottom: 20,
   },
 });
+
+export default App;
