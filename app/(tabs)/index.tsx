@@ -7,45 +7,19 @@ import HomeScreen from '../../screens/MainPage'; // Make sure this path is corre
 import AuctionScreen from '../../screens/AuctionScreen'; // Make sure this path is correct
 import ArtPieceDetailScreen from '../../screens/ArtPieceDetailScreen'; // Make sure this path is correct
 import ModeratorScreen from '../../screens/ModeratorScreen'; // Make sure this path is correct
-import AdminUsersScreen from '../../screens/AdminUsersScreen'; // Make sure this path is correct
+import AdminUsersScreen from '../../screens/AdminUserScreen'; // Make sure this path is correct
 import AdminArtPiecesScreen from '../../screens/AdminArtPiecesScreen'; // Make sure this path is correct
 import AdminAddArtPiecesScreen from '../../screens/AdminAddArtPiecesScreen'; // Make sure this path is correct
 import AdminSQLScreen from '../../screens/AdminSQLScreen'; // Make sure this path is correct
+import DrawerContent from '../components/DrawerContent';
 import Header from '../components/Header'; // Make sure this path is correct
+import LoginScreen from '../../screens/LoginScreen'; // Make sure this path is correct
+import RegisterScreen from '../../screens/RegisterScreen'; // Make sure this path is correct
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
-const DrawerContent = ({ navigation }) => {
-  return (
-    <View style={styles.drawerContent}>
-      <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-        <Text style={styles.drawerItem}>Home</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Auction')}>
-        <Text style={styles.drawerItem}>Auction</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('Moderator')}>
-        <Text style={styles.drawerItem}>Moderator</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminUsers')}>
-        <Text style={styles.drawerItem}>Admin Users</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminArtPieces')}>
-        <Text style={styles.drawerItem}>Admin Art Pieces</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminAddArtPieces')}>
-        <Text style={styles.drawerItem}>Add Art Pieces</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('AdminSQL')}>
-        <Text style={styles.drawerItem}>Submit SQL</Text>
-      </TouchableOpacity>
-      {/* Add more drawer items here */}
-    </View>
-  );
-};
-
-const MainStack = () => {
+const MainStack = ({ userRole }) => {
   return (
     <Stack.Navigator
       initialRouteName="Home"
@@ -56,36 +30,45 @@ const MainStack = () => {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="Auction" component={AuctionScreen} />
       <Stack.Screen name="ArtPieceDetail" component={ArtPieceDetailScreen} />
-      <Stack.Screen name="Moderator" component={ModeratorScreen} />
-      <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
-      <Stack.Screen name="AdminArtPieces" component={AdminArtPiecesScreen} />
-      <Stack.Screen name="AdminAddArtPieces" component={AdminAddArtPiecesScreen} />
-      <Stack.Screen name="AdminSQL" component={AdminSQLScreen} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      {userRole === 'moderator' && (
+        <Stack.Screen name="Moderator" component={ModeratorScreen} />
+      )}
+      {userRole === 'admin' && (
+        <>
+          <Stack.Screen name="AdminUsers" component={AdminUsersScreen} />
+          <Stack.Screen name="AdminArtPieces" component={AdminArtPiecesScreen} />
+          <Stack.Screen name="AdminAddArtPieces" component={AdminAddArtPiecesScreen} />
+          <Stack.Screen name="AdminSQL" component={AdminSQLScreen} />
+        </>
+      )}
     </Stack.Navigator>
   );
 };
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userRole, setUserRole] = useState('user'); // Default role is 'user'
 
   return (
-      <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} />}>
-        <Drawer.Screen
-          name="Main"
-          options={{
-            header: ({ navigation }) => (
-              <Header
-                navigation={navigation}
-                isLoggedIn={isLoggedIn}
-                onLogin={() => setIsLoggedIn(true)}
-                onProfilePress={() => console.log('Profile pressed')}
-              />
-            ),
-          }}
-        >
-          {() => <MainStack />}
-        </Drawer.Screen>
-      </Drawer.Navigator>
+    <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} userRole={userRole} />}>
+      <Drawer.Screen
+        name="Main"
+        options={{
+          header: ({ navigation }) => (
+            <Header
+              navigation={navigation}
+              isLoggedIn={isLoggedIn}
+              onLogin={() => navigation.navigate('Login')}
+              onProfilePress={() => console.log('Profile pressed')}
+            />
+          ),
+        }}
+      >
+        {() => <MainStack userRole={userRole} />}
+      </Drawer.Screen>
+    </Drawer.Navigator>
   );
 };
 
