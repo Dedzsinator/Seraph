@@ -1,47 +1,38 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 
-const DrawerContent = (props) => {
-  const { userRole } = props;
-
+const DrawerContent = ({ navigation, userRole }) => {
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView>
       <View style={styles.drawerContent}>
-        <DrawerItemList {...props} />
+        <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <Text style={styles.drawerItem}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Auction')}>
+          <Text style={styles.drawerItem}>Auction</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('SQLTest')}>
+          <Text style={styles.drawerItem}>SQL Test</Text>
+        </TouchableOpacity>
         {userRole === 'moderator' && (
-          <TouchableOpacity
-            style={styles.drawerItem}
-            onPress={() => props.navigation.navigate('Moderator')}
-          >
-            <Text>Moderator Panel</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('Moderator')}>
+            <Text style={styles.drawerItem}>Moderator</Text>
           </TouchableOpacity>
         )}
         {userRole === 'admin' && (
           <>
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => props.navigation.navigate('AdminUsers')}
-            >
-              <Text>Admin Users</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AdminUsers')}>
+              <Text style={styles.drawerItem}>Admin Users</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => props.navigation.navigate('AdminArtPieces')}
-            >
-              <Text>Admin Art Pieces</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AdminArtPieces')}>
+              <Text style={styles.drawerItem}>Admin Art Pieces</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => props.navigation.navigate('AdminAddArtPieces')}
-            >
-              <Text>Add Art Pieces</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AdminAddArtPieces')}>
+              <Text style={styles.drawerItem}>Add Art Pieces</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.drawerItem}
-              onPress={() => props.navigation.navigate('AdminSQL')}
-            >
-              <Text>Admin SQL</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AdminSQL')}>
+              <Text style={styles.drawerItem}>Submit SQL</Text>
             </TouchableOpacity>
           </>
         )}

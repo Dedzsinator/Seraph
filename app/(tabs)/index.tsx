@@ -11,6 +11,7 @@ import AdminUsersScreen from '../../screens/AdminUserScreen'; // Make sure this 
 import AdminArtPiecesScreen from '../../screens/AdminArtPiecesScreen'; // Make sure this path is correct
 import AdminAddArtPiecesScreen from '../../screens/AdminAddArtPiecesScreen'; // Make sure this path is correct
 import AdminSQLScreen from '../../screens/AdminSQLScreen'; // Make sure this path is correct
+import SQLTestScreen from '../../screens/SQLTestScreen'; // Make sure this path is correct
 import DrawerContent from '../components/DrawerContent';
 import Header from '../components/Header'; // Make sure this path is correct
 import LoginScreen from '../../screens/LoginScreen'; // Make sure this path is correct
@@ -32,6 +33,7 @@ const MainStack = ({ userRole }) => {
       <Stack.Screen name="ArtPieceDetail" component={ArtPieceDetailScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="SQLTest" component={SQLTestScreen} />
       {userRole === 'moderator' && (
         <Stack.Screen name="Moderator" component={ModeratorScreen} />
       )}
@@ -52,23 +54,23 @@ const App = () => {
   const [userRole, setUserRole] = useState('user'); // Default role is 'user'
 
   return (
-    <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} userRole={userRole} />}>
-      <Drawer.Screen
-        name="Main"
-        options={{
-          header: ({ navigation }) => (
-            <Header
-              navigation={navigation}
-              isLoggedIn={isLoggedIn}
-              onLogin={() => navigation.navigate('Login')}
-              onProfilePress={() => console.log('Profile pressed')}
-            />
-          ),
-        }}
-      >
-        {() => <MainStack userRole={userRole} />}
-      </Drawer.Screen>
-    </Drawer.Navigator>
+      <Drawer.Navigator drawerContent={(props) => <DrawerContent {...props} userRole={userRole} />}>
+        <Drawer.Screen
+          name="Main"
+          options={{
+            header: ({ navigation }) => (
+              <Header
+                navigation={navigation}
+                isLoggedIn={isLoggedIn}
+                onLogin={() => navigation.navigate('Login')}
+                onProfilePress={() => console.log('Profile pressed')}
+              />
+            ),
+          }}
+        >
+          {() => <MainStack userRole={userRole} />}
+        </Drawer.Screen>
+      </Drawer.Navigator>
   );
 };
 
