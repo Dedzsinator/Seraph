@@ -5,7 +5,7 @@ import random
 # Constants
 HARVARD_API_URL = "https://api.harvardartmuseums.org/object"
 HARVARD_API_KEY = "bf26671b-2bcf-453e-a0ba-2bbdd03c47c3"  # Replace with your actual API key
-CLASSIFICATIONS = ["Arms and Armor", "Coin", "Manuscripts", "Musical Instruments", "Prints"]  # Add more classifications as needed
+CLASSIFICATIONS = ["Arms and Armor", "Coin", "Manuscripts", "Musical Instruments", "Prints"]
 
 # Function to read existing CSV data
 def read_csv(filename):
@@ -18,16 +18,18 @@ def read_csv(filename):
         return []
 
 # Function to save data to CSV files
-def save_to_csv(filename, data):
+def save_to_csv(filename, data, header=None):
     with open(filename, mode="a", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
+        if header and file.tell() == 0:  # Write header only if file is empty
+            writer.writerow(header)
         writer.writerows(data)
 
 # Function to fetch data from the Harvard API for a given classification
 def fetch_harvard_data(classification):
     params = {
         "apikey": HARVARD_API_KEY,
-        "size": 100,  # Number of records to fetch per classification
+        "size": 1000,  # Number of records to fetch per classification
         "hasimage": 1,
         "classification": classification,
     }
@@ -36,6 +38,7 @@ def fetch_harvard_data(classification):
 
 # Extract relevant data from the Harvard API
 harvard_art_pieces = []
+artists = set()
 for classification in CLASSIFICATIONS:
     data = fetch_harvard_data(classification)
     for item in data["records"]:
@@ -43,11 +46,12 @@ for classification in CLASSIFICATIONS:
         artist = item.get("people", [{}])[0].get("name", "Unknown Artist")
         creation_date = item.get("dated", "Unknown Date")
         image_url = item.get("primaryimageurl", "No Image URL")
-        description = item.get("description", "No Description")
+        description = item.get("description", "")
         price = round(random.uniform(1000, 10000), 2)  # Random price between 1000 and 10000
 
         harvard_art_pieces.append([title, artist, creation_date, image_url, description, price])
-        print(f"Harvard ({classification}): {title}")
+        if artist != "Unknown Artist":
+            artists.add(artist)
 
 # Read existing data
 existing_regular_site_data = read_csv("regular_site_data.csv")
@@ -68,7 +72,10 @@ new_regular_site_data = [row for row in regular_site_data if tuple(row) not in e
 new_auction_data = [row for row in auction_data if tuple(row) not in existing_auction_set]
 
 # Save new data to CSV files
-save_to_csv("regular_site_data.csv", new_regular_site_data)
-save_to_csv("auction_data.csv", new_auction_data)
+save_to_csv("regular_site_data.csv", new_regular_site_data, header=["Title", "Artist", "Creation Date", "Image URL", "Description", "Price"])
+save_to_csv("auction_data.csv", new_auction_data, header=["Title", "Artist", "Creation Date", "Image URL", "Description", "Price"])
+
+# Save unique artists to a CSV file
+save_to_csv("artists.csv", [[artist] for artist in artists], header=["ArtistName"])
 
 print("Data saved to CSV files successfully.")

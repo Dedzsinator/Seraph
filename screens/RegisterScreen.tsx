@@ -24,22 +24,7 @@ const RegisterScreen = ({ navigation }) => {
   }, []);
 
   const handleRegister = async () => {
-    // Send a POST request to register API
-    try {
-      const response = await fetch('http://your-api-url/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, email }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        navigation.navigate('Login');
-      } else {
-        alert(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    
   };
 
   return (

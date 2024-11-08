@@ -1,0 +1,165 @@
+--DROP DATABASE IF EXISTS Seraph;
+
+--GO
+
+--CREATE DATABASE Seraph;
+
+--GO
+
+USE Seraph;
+
+GO
+
+--DROP TABLE IF EXISTS ArtPieces, Roles, UserRoles, Users, UserProfiles, Auctions, Bids, AuctionWinning, Sales, Likes, UserReviews, Payments, Notifications, Events, EventArtPieces, Galleries, PickupLocations, TopBuyers;
+
+--GO
+
+CREATE TABLE Users (
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    Username NVARCHAR(50) NOT NULL UNIQUE,
+    Email NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash NVARCHAR(256) NOT NULL,
+    Salt NVARCHAR(256) NOT NULL,
+    CreatedAt DATETIME NOT NULL,
+    IsActive BIT DEFAULT 1
+);
+
+CREATE TABLE TopBuyers (
+    TopBuyerID INT PRIMARY KEY IDENTITY,
+    UserID INT FOREIGN KEY REFERENCES Users(UserID),
+    TotalPurchases DECIMAL(15, 2) NOT NULL,
+    LastPurchaseDate DATETIME,
+    Rank INT
+);
+
+CREATE TABLE UserProfiles (
+    ProfileID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Bio NVARCHAR(500),
+    ProfilePic NVARCHAR(500)  
+);
+
+CREATE TABLE Roles (
+    RoleID INT PRIMARY KEY IDENTITY(1,1),
+    RoleName NVARCHAR(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE UserRoles (
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    RoleID INT NOT NULL FOREIGN KEY REFERENCES Roles(RoleID),
+    PRIMARY KEY (UserID, RoleID)
+);
+
+CREATE TABLE ArtPieces (
+    ArtID INT PRIMARY KEY IDENTITY(1,1),
+    Title NVARCHAR(200) NOT NULL,
+    ArtistID INT NOT NULL, 
+    Category NVARCHAR(100),
+    Description NVARCHAR(MAX),
+    SpecialStatus NVARCHAR(50), 
+    CreatedAt DATETIME NOT NULL,
+    ImageURL NVARCHAR(500) NOT NULL,
+    Price DECIMAL(18, 2) NOT NULL,
+);
+
+CREATE TABLE Auctions (
+    AuctionID INT PRIMARY KEY IDENTITY(1,1),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    ArtistID INT NOT NULL, 
+    Description NVARCHAR(MAX),
+    Category NVARCHAR(100),
+    StartPrice DECIMAL(18, 2) NOT NULL,
+    ReservePrice DECIMAL(18, 2), 
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME NOT NULL,
+    IsActive BIT DEFAULT 1,
+    ImageURL NVARCHAR(500) NOT NULL,
+);
+
+CREATE TABLE Bids (
+    BidID INT PRIMARY KEY IDENTITY(1,1),
+    AuctionID INT NOT NULL FOREIGN KEY REFERENCES Auctions(AuctionID),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    BidAmount DECIMAL(18, 2) NOT NULL,
+    BidTime DATETIME NOT NULL
+);
+
+CREATE TABLE AuctionWinning (
+    AuctionID INT PRIMARY KEY FOREIGN KEY REFERENCES Auctions(AuctionID),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    WinningBid DECIMAL(18, 2) NOT NULL,
+    WinTime DATETIME NOT NULL,
+    IsPaid BIT DEFAULT 0
+);
+
+CREATE TABLE Sales (
+    SaleID INT PRIMARY KEY IDENTITY(1,1),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID), 
+    SalesPrice DECIMAL(18, 2) NOT NULL,
+    SaleDate DATETIME NOT NULL,
+    IsPaid BIT DEFAULT 1
+);
+
+CREATE TABLE Likes (
+    LikeID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    LikedAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE UserReviews (
+    ReviewID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
+    ReviewText NVARCHAR(MAX) NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE()
+);
+
+CREATE TABLE Payments (
+    PaymentID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    PaymentMethod NVARCHAR(50),
+    PaymentAmount DECIMAL(18, 2) NOT NULL,
+    PaymentDate DATETIME NOT NULL
+);
+
+CREATE TABLE Notifications (
+    NotificationID INT PRIMARY KEY IDENTITY(1,1),
+    UserID INT NOT NULL FOREIGN KEY REFERENCES Users(UserID),
+    Message NVARCHAR(MAX) NOT NULL,
+    IsRead BIT DEFAULT 0,
+    CreatedAt DATETIME NOT NULL
+);
+
+CREATE TABLE Events (
+    EventID INT PRIMARY KEY IDENTITY(1,1),
+    EventName NVARCHAR(100) NOT NULL,
+    EventType NVARCHAR(50), 
+    StartDate DATETIME NOT NULL,
+    EndDate DATETIME,
+    IsActive BIT DEFAULT 1
+);
+
+CREATE TABLE EventArtPieces (
+    EventID INT NOT NULL FOREIGN KEY REFERENCES Events(EventID),
+    ArtID INT NOT NULL FOREIGN KEY REFERENCES ArtPieces(ArtID),
+    PRIMARY KEY (EventID, ArtID)
+);
+
+CREATE TABLE Galleries (
+    GalleryID INT PRIMARY KEY IDENTITY(1,1),
+    GalleryName NVARCHAR(200) NOT NULL,
+    Location NVARCHAR(300) NOT NULL
+);
+
+CREATE TABLE PickupLocations (
+    LocationID INT PRIMARY KEY IDENTITY(1,1),
+    LocationName NVARCHAR(200) NOT NULL,
+    Address NVARCHAR(300) NOT NULL,
+    GalleryID INT FOREIGN KEY REFERENCES Galleries(GalleryID)
+);

@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Text, Animated, Dimensions } from 'react-native';
+import React, { useRef, useState, useEffect } from 'react';
+import { View, FlatList, StyleSheet, TouchableOpacity, ActivityIndicator, Text, Image, Animated, Dimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import SearchBar from '../app/components/SearchBar'; // Adjust the import path as needed
+import BackToTopButton from '../app/components/BackToTopButton';
 import ArtCard from '../app/components/ArtCard'; // Adjust the import path as needed
+import SearchBar from '../app/components/SearchBar'; // Adjust the import path as needed
 
-const AuctionScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => {
+  const scrollRef = useRef(null);
+  
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +20,8 @@ const AuctionScreen = ({ navigation }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("http://localhost:3000/query?query=SELECT ap.Title AS ArtPieceTitle, a.Description AS AuctionDescription, a.Category AS AuctionCategory, a.StartDate, a.EndDate, a.ReservePrice FROM Auctions AS a JOIN ArtPieces AS ap ON a.ArtID = ap.ArtID WHERE a.IsActive = 1");
+        //const response = await fetch('http://localhost:3000/query?query=SELECT Title, ArtistID, Description, ImageURL FROM ArtPieces');
+        const response = await fetch("http://localhost:3000/query?query=SELECT ap.Title AS ArtPieceTitle,ap.Description AS ArtPieceDescription, ap.Category AS ArtPieceCategory, ap.ImageURL, u.Username AS ArtistName FROM ArtPieces AS ap JOIN Users AS u ON ap.ArtistID = u.UserID");
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -52,7 +56,7 @@ const AuctionScreen = ({ navigation }) => {
 
   const renderItem = ({ item, index }) => (
     <View style={styles.cardContainer}>
-      <ArtCard item={item} index={index} navigation={navigation} layoutMode={layoutMode} isAuction={true} />
+      <ArtCard item={item} index={index} navigation={navigation} layoutMode={layoutMode} />
     </View>
   );
 
@@ -67,14 +71,14 @@ const AuctionScreen = ({ navigation }) => {
   if (error) {
     return (
       <View style={styles.error}>
-        <Text style={styles.text}>Error loading auctioned art pieces: {error.message}</Text>
+        <Text style={styles.text}>Error loading art pieces: {error.message}</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <SearchBar placeholder="Search auctioned art pieces..." onSearch={handleSearch} />
+      <SearchBar placeholder="Search art pieces..." onSearch={handleSearch} />
       <View style={styles.selector}>
         <TouchableOpacity onPress={() => setLayoutMode('tiled')}>
           <Icon name="view-module" size={30} color={layoutMode === 'tiled' ? 'blue' : 'gray'} />
@@ -84,6 +88,7 @@ const AuctionScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <FlatList
+        ref={scrollRef}
         data={filteredData}
         renderItem={renderItem}
         keyExtractor={(item, index) => `${item.ArtID}-${index}`} // Ensure unique keys
@@ -101,7 +106,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f9f9f9',
-    padding: 20,
   },
   loader: {
     flex: 1,
@@ -115,63 +119,22 @@ const styles = StyleSheet.create({
   },
   selector: {
     flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 20,
+    justifyContent: 'flex-end',
+    marginVertical: 10,
+    marginRight: 10,
   },
-  button: {
-    padding: 10,
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    marginHorizontal: 10,
+  row: {
+    flex: 1,
+    justifyContent: 'space-around',
   },
-  buttonText: {
-    color: '#fff',
-  },
-  list: {
-    flexGrow: 1,
-  },
-  gridItem: {
+  cardContainer: {
     flex: 1,
     margin: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    alignItems: 'center',
+    maxWidth: '100%',
   },
-  fullItem: {
-    flex: 1,
-    margin: 10,
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  category: {
-    fontSize: 14,
-    color: '#888',
-    marginVertical: 5,
-  },
-  reservePrice: {
-    fontSize: 14,
-    color: '#000',
-    marginVertical: 5,
-  },
-  countdown: {
-    fontSize: 14,
-    color: '#FF0000',
-    marginTop: 10,
+  text: {
+    fontFamily: 'BLKCHCRY', // Apply the custom font
   },
 });
 
-export default AuctionScreen;
+export default HomeScreen;

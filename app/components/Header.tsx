@@ -38,9 +38,11 @@ const styles = StyleSheet.create({
     elevation: 4, // For Android shadow
   },
   title: {
-    fontSize: 20,
+    fontSize: 40,
     fontWeight: 'bold',
+    fontStyle: 'italic',
     color: '#fff',
+    fontFamily: 'BLKCHCRY',
   },
   menuButton: {
     padding: 10,
@@ -62,6 +64,7 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: '#007BFF',
+    fontFamily: 'BLKCHCRY',
   },
 });
 

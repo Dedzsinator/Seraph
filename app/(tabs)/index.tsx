@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreen from '../../screens/MainPage'; // Make sure this path is correct
+import HomeScreen from '../../screens/HomeScreen'; // Make sure this path is correct
 import AuctionScreen from '../../screens/AuctionScreen'; // Make sure this path is correct
 import ArtPieceDetailScreen from '../../screens/ArtPieceDetailScreen'; // Make sure this path is correct
 import ModeratorScreen from '../../screens/ModeratorScreen'; // Make sure this path is correct
@@ -16,6 +16,8 @@ import DrawerContent from '../components/DrawerContent';
 import Header from '../components/Header'; // Make sure this path is correct
 import LoginScreen from '../../screens/LoginScreen'; // Make sure this path is correct
 import RegisterScreen from '../../screens/RegisterScreen'; // Make sure this path is correct
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
